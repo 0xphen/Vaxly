@@ -1,6 +1,8 @@
 # PlanIt – A Distributed Task Management Platform
 
+
 A cloud-native, microservices-based system that enables teams to efficiently manage tasks in a modern backend environment.
+
 ---
 
 ### 💡 Features
@@ -11,3 +13,5 @@ A cloud-native, microservices-based system that enables teams to efficiently man
 * **File Attachments:** Upload and download task-related files stored in **AWS S3**.
 * **Notifications:** Receive **asynchronous notifications** for task updates via **AWS SQS**.
 * **Cloud & DevOps:** Services are **containerized with Docker** and deployed on **AWS EC2**. All cloud resources are managed using **Terraform**.
+
+---

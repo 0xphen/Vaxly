@@ -1,35 +1,13 @@
-# 🌳 PebbleTree: A High-Performance, Zero-Copy Key-Value Store in Rust
+# PlanIt – A Distributed Task Management Platform
 
-PebbleTree is a fast, durable, and memory-efficient storage engine in Rust. It provides a key-value interface and is inspired by the LSM-tree architecture used in systems like RocksDB and LevelDB - it’s built to prioritize:
-
-* **High write throughput** using an append-only architecture
-* **Crash safety** with a robust write-ahead log (WAL)
-* **Efficient disk usage** through smart flushing and compaction
-
-PebbleTree follows a **zero-copy approach**, using Rust’s low-level control to minimize unnecessary memory allocations and data copies. That means direct byte-slice manipulation, efficient memory layout, and fewer bottlenecks — ideal for systems where performance matters.
-
+A cloud-native, microservices-based system that enables teams to efficiently manage tasks in a modern backend environment.
 ---
 
-## 🛠️ What You'll Find Inside
+### 💡 Features
 
-PebbleTree is a low-level key-value store built to explore the core mechanics of storage engines — from logging to compaction. It includes:
-
-* **Write-Ahead Logging (WAL):** Ensures durability by recording writes before applying them.
-* **Memtables & SSTables:** In-memory buffers and on-disk sorted files, just like production-grade databases.
-* **Flush & Compaction Pipelines:** Moves data efficiently from memory to disk and keeps it optimized for reads.
-* **Zero-Copy I/O & Memory Layout Tuning:** Makes the most of Rust’s strengths for high performance.
-
-Whether you're exploring how storage engines work, leveling up your systems programming skills, or just need a lightweight key-value store, PebbleTree is built to be both a practical tool and a learning resource.
-
----
-
-## 🏗️ Architecture
-
-A high-level overview of PebbleTree's components and data flow:
-
-* **Writes** go to the **Write-Ahead Log (WAL)** for durability, then to an in-memory **Memtable**.
-* Full Memtables are **flushed** to new, immutable **Sorted String Tables (SSTables)** on disk.
-* **Reads** first check the Memtable, then search through SSTables (newest to oldest).
-* A background **compaction** process merges and optimizes SSTables, reclaiming space and improving read performance over time.
-
----
+* **User Accounts & Authentication:** Secure signup, login, and **JWT-based authentication**.
+* **Task Management:** Create, read, update, delete, and assign tasks; track status in real-time.
+* **Performance:** Implemented **Redis caching** to optimize read performance for frequently accessed tasks.
+* **File Attachments:** Upload and download task-related files stored in **AWS S3**.
+* **Notifications:** Receive **asynchronous notifications** for task updates via **AWS SQS**.
+* **Cloud & DevOps:** Services are **containerized with Docker** and deployed on **AWS EC2**. All cloud resources are managed using **Terraform**.

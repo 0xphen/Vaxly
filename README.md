@@ -1,8 +1,8 @@
-# 🌍 GlobeX – Distributed Currency Conversion Platform
+# 🌍 Vaxly – Distributed Currency Conversion Platform
 
 ### **Project Overview**
 
-**GlobeX** is a production-grade currency conversion platform designed to handle real-time exchange rate requests with high reliability and performance. While its core function is simple, the project's primary goal is to demonstrate mastery of complex backend engineering principles, including distributed systems, asynchronous workflows, and cloud-native architecture.
+**Vaxly** is a production-grade currency conversion platform designed to handle real-time exchange rate requests with high reliability and performance. While its core function is simple, the project's primary goal is to demonstrate mastery of complex backend engineering principles, including distributed systems, asynchronous workflows, and cloud-native architecture.
 
 ---
 

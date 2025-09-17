@@ -1,17 +1,32 @@
-# PlanIt – A Distributed Task Management Platform
+# 🌍 GlobeX – Distributed Currency Conversion Platform
 
+### **Project Overview**
 
-A cloud-native, microservices-based system that enables teams to efficiently manage tasks in a modern backend environment.
+**GlobeX** is a production-grade currency conversion platform designed to handle real-time exchange rate requests with high reliability and performance. While its core function is simple, the project's primary goal is to demonstrate mastery of complex backend engineering principles, including distributed systems, asynchronous workflows, and cloud-native architecture.
 
 ---
 
-### 💡 Features
+### **Core Features & Architectural Principles**
 
-* **User Accounts & Authentication:** Secure signup, login, and **JWT-based authentication**.
-* **Task Management:** Create, read, update, delete, and assign tasks; track status in real-time.
-* **Performance:** Implemented **Redis caching** to optimize read performance for frequently accessed tasks.
-* **File Attachments:** Upload and download task-related files stored in **AWS S3**.
-* **Notifications:** Receive **asynchronous notifications** for task updates via **AWS SQS**.
-* **Cloud & DevOps:** Services are **containerized with Docker** and deployed on **AWS EC2**. All cloud resources are managed using **Terraform**.
+-   **Microservices Architecture:** The system is composed of four distinct, independently deployable services—Conversion, Aggregator, Worker, and History—each with a clear, single responsibility.
+-   **Low-Latency Caching:** Utilizes **Redis (AWS ElastiCache)** as a hot cache to serve currency conversion requests with sub-millisecond latency.
+-   **Asynchronous Processing:** Leverages **AWS SQS** for a resilient, asynchronous background refresh mechanism, decoupling the public API from rate fetching and persistence logic.
+-   **Data Aggregation & Resilience:** Aggregates exchange rates from multiple external providers to ensure data accuracy and reliability. Implements **retries** and **circuit breakers** to gracefully handle external API failures.
+-   **Durable Persistence:** Stores an authoritative history of all fetched rates in **Postgres (AWS RDS)**, providing a durable source of truth and a fallback for cache misses.
+-   **Infrastructure-as-Code:** The entire cloud infrastructure (ECS, RDS, SQS, ElastiCache) is defined and provisioned using **Terraform**, ensuring the environment is reproducible and scalable.
+
+---
+
+### **Tech Stack**
+
+| Category | Technology |
+| :--- | :--- |
+| **Backend** | Java 17, Spring Boot 3 |
+| **Persistence** | Spring Data JPA, Hibernate, PostgreSQL (AWS RDS) |
+| **Caching** | Redis (AWS ElastiCache) |
+| **Messaging** | AWS SQS |
+| **Cloud Infrastructure** | AWS ECS Fargate, ALB, Secrets Manager |
+| **Infra as Code** | Terraform |
+| **Observability** | Spring Actuator, Micrometer |
 
 ---

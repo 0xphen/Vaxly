@@ -1,9 +1,9 @@
-package com.vaxly.conversionservice.dto;
+package com.vaxly.conversionservice.dtos;
 import java.time.Instant;
 
 import com.vaxly.conversionservice.enums.StateFlag;
 
-public class ConversionResponse {
+public class ConversionResponseDto {
     private final String from;
     private final String to;
     private final double rate;
@@ -12,7 +12,7 @@ public class ConversionResponse {
     private final Instant timestamp;
     private final StateFlag stateFlag;
 
-    public ConversionResponse(String from, String to, double rate, double convertedAmount, String source, Instant timestamp, StateFlag stateFlag) {
+    public ConversionResponseDto(String from, String to, double rate, double convertedAmount, String source, Instant timestamp, StateFlag stateFlag) {
         this.from = from;
         this.to = to;
         this.rate = rate;

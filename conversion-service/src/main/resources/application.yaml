@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: conversion-service
+  profiles:
+    default: dev
+

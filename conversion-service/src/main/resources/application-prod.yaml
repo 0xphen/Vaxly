@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:qfen}
+    username: ${DB_USER:qfen}
+    password: ${DB_PASS:password}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  data:
+    redis:
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASS:}
+      host: ${REDIS_HOST:localhost}
+

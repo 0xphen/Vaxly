@@ -17,6 +17,7 @@
 
     <modules>
         <module>conversion-service</module>
+        <module>historical-service</module>
     </modules>
 
 </project>

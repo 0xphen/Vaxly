@@ -1,5 +1,7 @@
-package com.vaxly.conversionservice;
+package com.vaxly.conversionservice.unit;
 
+import com.vaxly.conversionservice.ConversionController;
+import com.vaxly.conversionservice.ConversionService;
 import com.vaxly.conversionservice.dtos.ConversionResponseDto;
 import com.vaxly.conversionservice.enums.StateFlag;
 import org.junit.jupiter.api.Test;

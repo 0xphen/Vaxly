@@ -15,7 +15,6 @@ public class RedisConfig {
         RedisTemplate<String, RateInfoDto> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
 
-        // Configure serializers for keys and values
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new Jackson2JsonRedisSerializer<>(RateInfoDto.class));
         template.setHashKeySerializer(new StringRedisSerializer());

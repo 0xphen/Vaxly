@@ -7,10 +7,10 @@ import java.time.Instant;
 import java.util.Optional;
 
 @Service
-public class HistoricalService {
+public class HistoricalRateService {
     private final HistoricalRateRepository historicalRateRepository;
 
-    public HistoricalService(HistoricalRateRepository historicalRateRepository) {
+    public HistoricalRateService(HistoricalRateRepository historicalRateRepository) {
         this.historicalRateRepository = historicalRateRepository;
     }
 

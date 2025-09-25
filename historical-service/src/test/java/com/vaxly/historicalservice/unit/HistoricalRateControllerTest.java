@@ -3,7 +3,7 @@ package com.vaxly.historicalservice.unit;
 import com.vaxly.historicalservice.HistoricalController;
 import com.vaxly.historicalservice.HistoricalRateDto;
 import com.vaxly.historicalservice.HistoricalRate;
-import com.vaxly.historicalservice.HistoricalService;
+import com.vaxly.historicalservice.HistoricalRateService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +26,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(HistoricalController.class)
-public class HistoricalControllerTest {
+public class HistoricalRateControllerTest {
     @MockitoBean
-    private HistoricalService historicalService;
+    private HistoricalRateService historicalRateService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -41,7 +41,7 @@ public class HistoricalControllerTest {
         Instant t = Instant.now();
         HistoricalRateDto mockResponse = new HistoricalRateDto(currencyPair, BigDecimal.valueOf(1.9), t);
 
-        when(historicalService.getHistoricalRate(currencyPair)).thenReturn(Optional.of(mockResponse));
+        when(historicalRateService.getHistoricalRate(currencyPair)).thenReturn(Optional.of(mockResponse));
 
         mockMvc.perform(get("/api/v1/historical-rates/" + currencyPair))
                 .andExpect(status().isOk())
@@ -70,15 +70,15 @@ public class HistoricalControllerTest {
 
         HistoricalRateDto requestDto = new HistoricalRateDto(currencyPair, rate, now);
 
-        HistoricalRate mockCreatedRate = new HistoricalRate(
+        HistoricalRate mockHistoricalRate = new HistoricalRate(
                 currencyPair,
                 rate,
                 now
         );
-        ReflectionTestUtils.setField(mockCreatedRate, "id", 123);
+        ReflectionTestUtils.setField(mockHistoricalRate, "id", 123);
 
-        when(historicalService.createOrUpdateHistoricalRate(any(HistoricalRateDto.class)))
-                .thenReturn(mockCreatedRate);
+        when(historicalRateService.createOrUpdateHistoricalRate(any(HistoricalRateDto.class)))
+                .thenReturn(mockHistoricalRate);
 
         mockMvc.perform(post("/api/v1/historical-rates")
                         .with(csrf())

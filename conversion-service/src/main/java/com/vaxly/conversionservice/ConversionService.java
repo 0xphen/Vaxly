@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vaxly.conversionservice.dtos.ConversionResponseDto;
 import com.vaxly.conversionservice.dtos.RateInfoDto;
 import com.vaxly.conversionservice.enums.StateFlag;
+import com.vaxly.conversionservice.exceptions.DownStreamException;
 import com.vaxly.conversionservice.security.AwsCognitoTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -126,12 +127,8 @@ public class ConversionService {
             } else {
                 return Optional.empty();
             }
-
-        } catch (WebClientResponseException e) {
-            throw new RuntimeException(
-                    "HTTP error fetching rate: " + e.getStatusCode() + " " + e.getResponseBodyAsString(), e);
         } catch (Exception e) {
-            throw new RuntimeException("Unexpected error fetching rate", e);
+            throw new DownStreamException("Failed to retrieve historical rate for currency pair " + currencyPair);
         }
     }
 }

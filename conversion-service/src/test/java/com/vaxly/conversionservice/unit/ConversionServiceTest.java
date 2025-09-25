@@ -4,8 +4,10 @@ import com.vaxly.conversionservice.ConversionService;
 import com.vaxly.conversionservice.dtos.ConversionResponseDto;
 import com.vaxly.conversionservice.dtos.RateInfoDto;
 import com.vaxly.conversionservice.enums.StateFlag;
+import com.vaxly.conversionservice.security.AwsCognitoTokenProvider;
 import org.mockito.Mock;
 import org.mockito.InjectMocks;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.Test;
@@ -15,6 +17,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
 import java.time.Instant;
+import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,6 +31,10 @@ public class ConversionServiceTest {
     @Mock
     private ValueOperations<String, RateInfoDto> valueOperations;
 
+    @Mock
+    AwsCognitoTokenProvider tokenProvider;
+
+    @Spy
     @InjectMocks
     private ConversionService conversionService;
 
@@ -46,18 +53,46 @@ public class ConversionServiceTest {
         assertEquals(StateFlag.CACHED, result.getStateFlag());
     }
 
-//    @Test
-//    @DisplayName("should return historical data")
-//    public void whenConvert_thenReturnsHistoricalData() {
-//        // TODO: mock call to historical-service to return Optional with data
-//    }
+    @Test
+    @DisplayName("convert() returns historical rate when cache is empty")
+    public void givenCacheEmpty_whenConvert_thenReturnsHistoricalRate() {
+        String accessToken = "test_token";
+        String source = "test_source";
+        double rate = 1.25;
 
-//    @Test
-//    @DisplayName("should return UNAVAILABLE state when no rate is found in cache or history")
-//    public void givenNoDataSources_whenConvert_thenStateIsUnavailable() {
-//        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-//        when(valueOperations.get("USD_EUR")).thenReturn(null);
-//
-//        // TODO: mock call to historical-service to return empty Optional
-//    }
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get("USD_EUR")).thenReturn(null);
+        when(tokenProvider.getAccessToken()).thenReturn(accessToken);
+
+        RateInfoDto mockHistoricalRate = new RateInfoDto(source, Instant.now(), rate);
+        doReturn(Optional.of(mockHistoricalRate))
+                .when(conversionService).getHistoricalRate("USD_EUR", accessToken);
+
+        ConversionResponseDto result = conversionService.convert("USD", "EUR", 100.0);
+
+        assertEquals(rate, result.getRate());
+        assertEquals(source, result.getSource());
+        assertEquals(StateFlag.FALLBACK_DB, result.getStateFlag());
+    }
+
+
+    @Test
+    @DisplayName("convert() returns UNAVAILABLE when no cached or historical rate exists")
+    public void givenNoCacheOrHistoricalData_whenConvert_thenReturnsUnavailableState() {
+        String accessToken = "test_token";
+
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get("USD_EUR")).thenReturn(null);
+        when(tokenProvider.getAccessToken()).thenReturn(accessToken);
+
+        doReturn(Optional.empty()).when(conversionService).getHistoricalRate("USD_EUR", accessToken);
+
+        ConversionResponseDto result = conversionService.convert("USD", "EUR", 100.0);
+
+        assertEquals(0.0, result.getRate());
+        assertNull(result.getSource());
+        assertEquals(StateFlag.UNAVAILABLE, result.getStateFlag());
+        assertNull(result.getTimestamp());
+    }
+
 }

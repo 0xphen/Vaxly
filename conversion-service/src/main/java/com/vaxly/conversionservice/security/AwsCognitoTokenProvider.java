@@ -66,7 +66,7 @@ public class AwsCognitoTokenProvider {
         lock.lock();
         try {
             if (currentToken != null && !currentToken.isExpiredOrExpiringSoon()) {
-                return; // another thread already refreshed
+                return;
             }
 
             CognitoResponseDto response = requestNewTokenFromCognito();

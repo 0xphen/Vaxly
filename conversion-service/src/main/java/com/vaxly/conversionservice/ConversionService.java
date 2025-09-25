@@ -21,15 +21,14 @@ public class ConversionService {
 
     private final RedisTemplate<String, RateInfoDto> redisTemplate;
     private final WebClient webClient;
-
-    @Autowired
-    AwsCognitoTokenProvider tokenProvider;
+    private final  AwsCognitoTokenProvider tokenProvider;
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public ConversionService(RedisTemplate<String, RateInfoDto> redisTemplate, WebClient webClient) {
+    public ConversionService(RedisTemplate<String, RateInfoDto> redisTemplate, WebClient webClient, AwsCognitoTokenProvider tokenProvider) {
         this.redisTemplate = redisTemplate;
         this.webClient = webClient;
+        this.tokenProvider = tokenProvider;
     }
 
     /**

@@ -5,13 +5,15 @@ import java.time.Instant;
 
 public class HistoricalRateDto {
     private final String currencyPair;
+    private final String source;
     private final BigDecimal rate;
     private final Instant lastUpdatedAt;
 
-    public HistoricalRateDto(String currencyPair, BigDecimal rate, Instant lastUpdatedAt) {
+    public HistoricalRateDto(String currencyPair, BigDecimal rate, Instant lastUpdatedAt, String source) {
         this.currencyPair = currencyPair;
         this.rate = rate;
         this.lastUpdatedAt = lastUpdatedAt;
+        this.source = source;
     }
 
     public String getCurrencyPair() {
@@ -22,5 +24,8 @@ public class HistoricalRateDto {
     }
     public Instant getLastUpdatedAt() {
         return lastUpdatedAt;
+    }
+    public String getSource() {
+        return source;
     }
 }

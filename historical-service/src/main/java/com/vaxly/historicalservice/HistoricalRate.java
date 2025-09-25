@@ -15,6 +15,9 @@ public class HistoricalRate {
     @Column(nullable = false, unique = true)
     private String currencyPair;
 
+    @Column(nullable = false, unique = false)
+    private String source;
+
     @Column(nullable = false, precision = 19, scale = 8)
     private BigDecimal rate;
 
@@ -23,10 +26,11 @@ public class HistoricalRate {
 
     public HistoricalRate() {}
 
-    public HistoricalRate(String currencyPair, BigDecimal rate, Instant lastUpdatedAt) {
+    public HistoricalRate(String currencyPair, BigDecimal rate, Instant lastUpdatedAt, String source) {
         this.currencyPair = currencyPair;
         this.rate = rate;
         this.lastUpdatedAt = lastUpdatedAt;
+        this.source = source;
     }
 
     public Integer getId() {
@@ -51,5 +55,13 @@ public class HistoricalRate {
 
     void setRate(BigDecimal rate) {
         this.rate = rate;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 }

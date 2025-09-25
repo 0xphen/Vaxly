@@ -32,7 +32,8 @@ public class HistoricalController {
         HistoricalRateDto responseDto = new HistoricalRateDto(
                 createdRate.getCurrencyPair(),
                 createdRate.getRate(),
-                createdRate.getLastUpdatedAt()
+                createdRate.getLastUpdatedAt(),
+                createdRate.getSource()
         );
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()

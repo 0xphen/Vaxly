@@ -37,8 +37,9 @@ public class HistoricalRateServiceTest {
         String currencyPair = "EUR_USD";
         Instant now = Instant.now();
         BigDecimal rate = BigDecimal.valueOf(1.95);
+        String source = "test_source";
 
-        HistoricalRate storedRate = new HistoricalRate(currencyPair, rate, now);
+        HistoricalRate storedRate = new HistoricalRate(currencyPair, rate, now, source);
         ReflectionTestUtils.setField(storedRate, "id", 123);
 
         when(historicalRateRepository.findByCurrencyPair(currencyPair))
@@ -50,6 +51,7 @@ public class HistoricalRateServiceTest {
         assertEquals(currencyPair, result.get().getCurrencyPair(), "Currency pair should match");
         assertEquals(rate, result.get().getRate(), "Rate should match");
         assertEquals(now, result.get().getLastUpdatedAt(), "LastUpdatedAt should match");
+        assertEquals(source, result.get().getSource(), "Source should match");
     }
 
     @Test
@@ -71,12 +73,14 @@ public class HistoricalRateServiceTest {
         String currencyPair = "EUR_USD";
         BigDecimal rate = BigDecimal.valueOf(1.95);
         Instant now = Instant.now();
-        HistoricalRateDto dto = new HistoricalRateDto(currencyPair, rate, now);
+        String source = "test_source";
+
+        HistoricalRateDto dto = new HistoricalRateDto(currencyPair, rate, now, source);
 
         when(historicalRateRepository.findByCurrencyPair(currencyPair))
                 .thenReturn(Optional.empty());
 
-        HistoricalRate savedRate = new HistoricalRate(currencyPair, rate, now);
+        HistoricalRate savedRate = new HistoricalRate(currencyPair, rate, now, source);
         ReflectionTestUtils.setField(savedRate, "id", 1);
         when(historicalRateRepository.save(any(HistoricalRate.class))).thenReturn(savedRate);
 
@@ -92,6 +96,7 @@ public class HistoricalRateServiceTest {
         assertEquals(currencyPair, savedArg.getCurrencyPair());
         assertEquals(rate, savedArg.getRate());
         assertEquals(now, savedArg.getLastUpdatedAt());
+        assertEquals(source, savedArg.getSource());
     }
 
     @Test
@@ -100,7 +105,9 @@ public class HistoricalRateServiceTest {
         String currencyPair = "EUR_USD";
         BigDecimal oldRate = BigDecimal.valueOf(1.9);
         Instant oldTime = Instant.now().minusSeconds(3600);
-        HistoricalRate existingRate = new HistoricalRate(currencyPair, oldRate, oldTime);
+        String source = "test_source";
+
+        HistoricalRate existingRate = new HistoricalRate(currencyPair, oldRate, oldTime, source);
         ReflectionTestUtils.setField(existingRate, "id", 1);
 
         when(historicalRateRepository.findByCurrencyPair(currencyPair))
@@ -110,7 +117,7 @@ public class HistoricalRateServiceTest {
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         BigDecimal newRate = BigDecimal.valueOf(1.95);
-        HistoricalRateDto dto = new HistoricalRateDto(currencyPair, newRate, Instant.now());
+        HistoricalRateDto dto = new HistoricalRateDto(currencyPair, newRate, Instant.now(), source);
 
         HistoricalRate result = historicalRateService.createOrUpdateHistoricalRate(dto);
 
@@ -126,5 +133,4 @@ public class HistoricalRateServiceTest {
         assertEquals(newRate, savedArg.getRate());
         assertNotNull(savedArg.getLastUpdatedAt());
     }
-
 }

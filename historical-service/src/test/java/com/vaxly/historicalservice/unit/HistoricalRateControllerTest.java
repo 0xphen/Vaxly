@@ -39,7 +39,8 @@ public class HistoricalRateControllerTest {
     void givenExistingCurrencyPair_whenGetHistoricalRate_thenReturns200AndRate() throws Exception {
         String currencyPair = "EUR_USD";
         Instant t = Instant.now();
-        HistoricalRateDto mockResponse = new HistoricalRateDto(currencyPair, BigDecimal.valueOf(1.9), t);
+        String source = "test_source";
+        HistoricalRateDto mockResponse = new HistoricalRateDto(currencyPair, BigDecimal.valueOf(1.9), t, source);
 
         when(historicalRateService.getHistoricalRate(currencyPair)).thenReturn(Optional.of(mockResponse));
 
@@ -47,7 +48,8 @@ public class HistoricalRateControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.currencyPair").value(currencyPair))
                 .andExpect(jsonPath("$.rate").value(1.9))
-                .andExpect(jsonPath("$.lastUpdatedAt").value(t.toString()));
+                .andExpect(jsonPath("$.lastUpdatedAt").value(t.toString()))
+                .andExpect(jsonPath("$.source").value(source));
     }
 
     @Test
@@ -67,13 +69,15 @@ public class HistoricalRateControllerTest {
         String currencyPair = "EUR_USD";
         Instant now = Instant.now();
         BigDecimal rate = BigDecimal.valueOf(1.95);
+        String source = "test_source";
 
-        HistoricalRateDto requestDto = new HistoricalRateDto(currencyPair, rate, now);
+        HistoricalRateDto requestDto = new HistoricalRateDto(currencyPair, rate, now, source);
 
         HistoricalRate mockHistoricalRate = new HistoricalRate(
                 currencyPair,
                 rate,
-                now
+                now,
+                source
         );
         ReflectionTestUtils.setField(mockHistoricalRate, "id", 123);
 
@@ -95,7 +99,9 @@ public class HistoricalRateControllerTest {
                 .andExpect(header().exists("Location"))
                 .andExpect(jsonPath("$.currencyPair").value(currencyPair))
                 .andExpect(jsonPath("$.rate").value(rate.doubleValue()))
-                .andExpect(jsonPath("$.lastUpdatedAt").value(now.toString()));
+                .andExpect(jsonPath("$.lastUpdatedAt").value(now.toString()))
+                .andExpect(jsonPath("$.source").value(source));
+
     }
 
     @Test

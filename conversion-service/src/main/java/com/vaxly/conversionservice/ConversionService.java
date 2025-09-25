@@ -1,10 +1,17 @@
 package com.vaxly.conversionservice;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vaxly.conversionservice.dtos.ConversionResponseDto;
 import com.vaxly.conversionservice.dtos.RateInfoDto;
 import com.vaxly.conversionservice.enums.StateFlag;
+import com.vaxly.conversionservice.security.AwsCognitoTokenProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -13,73 +20,119 @@ import java.util.Optional;
 public class ConversionService {
 
     private final RedisTemplate<String, RateInfoDto> redisTemplate;
+    private final WebClient webClient;
 
-    public ConversionService(RedisTemplate<String, RateInfoDto> redisTemplate) {
+    @Autowired
+    AwsCognitoTokenProvider tokenProvider;
+
+    private final ObjectMapper mapper = new ObjectMapper();
+
+    public ConversionService(RedisTemplate<String, RateInfoDto> redisTemplate, WebClient webClient) {
         this.redisTemplate = redisTemplate;
+        this.webClient = webClient;
     }
 
     /**
-     * Converts a currency amount by checking cache, then falling back to historical data.
-     * Publishes a background refresh job if a live rate is not found.
+     * Converts an amount from one currency to another using a tiered data source strategy.
+     * The process prioritizes speed by checking a local cache first, before falling back
+     * to a remote service if no data is found.
+     * <p>
+     * 1. **Cache First**: Attempts to retrieve the conversion rate from Redis.
+     * 2. **API Fallback**: If the rate is not in the cache, it calls the historical-service API
+     * to fetch the rate.
+     * 3. **Unavailable**: If both sources fail, it returns a response with an 'UNAVAILABLE' state.
      *
-     * @param from   the source currency
-     * @param to     the target currency
-     * @param amount the amount to convert
-     * @return a ConversionResponseDto with the converted amount and data state
+     * @param from   Source currency code (e.g., "USD").
+     * @param to     Target currency code (e.g., "EUR").
+     * @param amount Amount to convert.
+     * @return A {@link ConversionResponseDto} with the conversion result and data source state.
      */
     public ConversionResponseDto convert(String from, String to, double amount) {
         String currencyPairKey = from + "_" + to;
 
-        // Try to get a rate from Redis cache
         Optional<RateInfoDto> cachedData = getCachedRate(currencyPairKey);
         if (cachedData.isPresent()) {
             RateInfoDto data = cachedData.get();
-            return new ConversionResponseDto(from, to, data.getRate(), amount * data.getRate(), data.getSource(), data.getTimestamp(), StateFlag.CACHED);
+            return new ConversionResponseDto(
+                    from, to,
+                    data.getRate(),
+                    amount * data.getRate(),
+                    data.getSource(),
+                    data.getTimestamp(),
+                    StateFlag.CACHED
+            );
         }
 
-        // Fallback to the historical database
-        Optional<RateInfoDto> historicalData = getHistoricalRate(currencyPairKey);
+        String accessToken = tokenProvider.getAccessToken();
+        Optional<RateInfoDto> historicalData = getHistoricalRate(currencyPairKey, accessToken);
         if (historicalData.isPresent()) {
             RateInfoDto data = historicalData.get();
-            // TODO:
-           // sqsService.publishRefreshMessage(from, to);
-            return new ConversionResponseDto(from, to, data.getRate(), amount * data.getRate(), data.getSource(), data.getTimestamp(), StateFlag.FALLBACK_DB);
+            return new ConversionResponseDto(
+                    from, to,
+                    data.getRate(),
+                    amount * data.getRate(),
+                    data.getSource(),
+                    data.getTimestamp(),
+                    StateFlag.FALLBACK_DB
+            );
         }
 
-        // TODO:
-        // Return unavailable and trigger a refresh if all sources fail
-        // sqsService.publishRefreshMessage(from, to);
+        // TODO: Publish a background refresh message for this currency pair to trigger async rate population
         return new ConversionResponseDto(from, to, 0.0, 0.0, null, null, StateFlag.UNAVAILABLE);
     }
 
     /**
-     * Attempts to retrieve a rate from the Redis cache.
+     * Retrieves a currency conversion rate from the Redis cache.
      *
-     * @param key the currency pair key (e.g., "USD_EUR")
-     * @return an Optional containing the cached data, or empty if not found
+     * @param key The currency pair key (e.g., "USD_EUR").
+     * @return An {@link Optional} containing the cached {@link RateInfoDto}, or empty if not found.
      */
     private Optional<RateInfoDto> getCachedRate(String key) {
         return Optional.ofNullable(redisTemplate.opsForValue().get(key));
     }
 
     /**
-     * Mocks a REST API call to a separate History Service to get historical rate data.
-     * In a real implementation, this would use a RestTemplate or WebClient to make an HTTP call.
+     * Fetches the historical rate for a currency pair from an external service.
+     * <p>
+     * This method performs a blocking HTTP GET request, authenticating with an
+     * AWS Cognito access token. It deserializes the JSON response into a
+     * {@link RateInfoDto}.
      *
-     * @param currencyPairKey The key for the currency pair (e.g., "USD_EUR")
-     * @return An Optional containing the historical rate, or an empty Optional if not found.
+     * @param currencyPair The currency pair string (e.g., "USD_EUR").
+     * @param accessToken  The AWS Cognito access token for authorization.
+     * @return An {@link Optional} containing the {@link RateInfoDto} if the request is successful and valid,
+     * or empty if the response is malformed.
+     * @throws RuntimeException if the HTTP request fails (e.g., network error, 4xx/5xx status codes).
      */
-    public Optional<RateInfoDto> getHistoricalRate(String currencyPairKey) {
-        // This is a mock implementation.
-        // In a real scenario, you'd use a RestTemplate or WebClient to call the History Service API.
+    public Optional<RateInfoDto> getHistoricalRate(String currencyPair, String accessToken) {
+        try {
+            // Make a blocking HTTP request to the history-service
+            String responseBody = webClient.get()
+                    .uri(currencyPair)
+                    .header("Authorization", "Bearer " + accessToken)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::isError, resp ->
+                            resp.bodyToMono(String.class)
+                                    .map(body -> new RuntimeException("Downstream error: " + body)))
+                    .bodyToMono(String.class)
+                    .block();
 
-        // Example of a successful call
-//        if ("USD_EUR".equals(currencyPairKey)) {
-//            RateInfoDto mockData = new RateInfoDto("source", Instant.now(), 1.12);
-//            return Optional.of(mockData);
-//        }
+            JsonNode node = mapper.readTree(responseBody);
 
-        // Example of a failed call (data not found)
-        return Optional.empty();
+            if (node.has("rate") && node.has("source")) {
+                double rate = node.get("rate").asDouble();
+                String source = node.get("source").asText();
+                Instant timestamp = Instant.now();
+                return Optional.of(new RateInfoDto(source, timestamp, rate));
+            } else {
+                return Optional.empty();
+            }
+
+        } catch (WebClientResponseException e) {
+            throw new RuntimeException(
+                    "HTTP error fetching rate: " + e.getStatusCode() + " " + e.getResponseBodyAsString(), e);
+        } catch (Exception e) {
+            throw new RuntimeException("Unexpected error fetching rate", e);
+        }
     }
 }

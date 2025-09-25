@@ -21,7 +21,7 @@ public class HistoricalRateService {
      */
     public Optional<HistoricalRateDto> getHistoricalRate(String currencyPair) {
         Optional<HistoricalRate> historicalRate =  historicalRateRepository.findByCurrencyPair(currencyPair);
-        return historicalRate.map(rate -> new HistoricalRateDto(rate.getCurrencyPair(), rate.getRate(), rate.getLastUpdatedAt()));
+        return historicalRate.map(rate -> new HistoricalRateDto(rate.getCurrencyPair(), rate.getRate(), rate.getLastUpdatedAt(), rate.getSource()));
     }
 
     /**
@@ -38,9 +38,10 @@ public class HistoricalRateService {
             HistoricalRate rateToUpdate = existingRate.get();
             rateToUpdate.setRate(historicalRateDto.getRate());
             rateToUpdate.setLastUpdatedAt(Instant.now());
+            rateToUpdate.setSource(historicalRateDto.getSource());
             return historicalRateRepository.save(rateToUpdate);
         } else {
-            return historicalRateRepository.save(new HistoricalRate(historicalRateDto.getCurrencyPair(), historicalRateDto.getRate(), historicalRateDto.getLastUpdatedAt()));
+            return historicalRateRepository.save(new HistoricalRate(historicalRateDto.getCurrencyPair(), historicalRateDto.getRate(), historicalRateDto.getLastUpdatedAt(), historicalRateDto.getSource()));
         }
     }
 }

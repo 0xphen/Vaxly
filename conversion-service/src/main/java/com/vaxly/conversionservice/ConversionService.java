@@ -33,6 +33,21 @@ public class ConversionService {
         this.tokenProvider = tokenProvider;
     }
 
+    /**
+     * Converts an amount from one currency to another using a tiered data source strategy.
+     * The process prioritizes speed by checking a local cache first, before falling back
+     * to a remote service if no data is found.
+     * <p>
+     * 1. **Cache First**: Attempts to retrieve the conversion rate from Redis.
+     * 2. **API Fallback**: If the rate is not in the cache, it calls the historical-service API
+     * to fetch the rate.
+     * 3. **Unavailable**: If both sources fail, it returns a response with an 'UNAVAILABLE' state.
+     *
+     * @param from   Source currency code (e.g., "USD").
+     * @param to     Target currency code (e.g., "EUR").
+     * @param amount Amount to convert.
+     * @return A {@link ConversionResponseDto} with the conversion result and data source state.
+     */
     public ConversionResponseDto convert(String from, String to, double amount) {
         String currencyPairKey = from + "_" + to;
         logger.info("Starting conversion for {} from {} to {}. Checking cache for key: {}", amount, from, to, currencyPairKey);
@@ -68,9 +83,18 @@ public class ConversionService {
         }
 
         logger.warn("Rate for {} not found in cache or external API. Returning UNAVAILABLE status.", currencyPairKey);
+
+        // Publish a background refresh message for this currency pair to trigger async rate population
+        // TODO: Publish a background refresh message for this currency pair to trigger async rate population
         return new ConversionResponseDto(from, to, 0.0, 0.0, null, null, StateFlag.UNAVAILABLE);
     }
 
+    /**
+     * Retrieves a currency conversion rate from the Redis cache.
+     *
+     * @param key The currency pair key (e.g., "USD_EUR").
+     * @return An {@link Optional} containing the cached {@link RateInfoDto}, or empty if not found.
+     */
     private Optional<RateInfoDto> getCachedRate(String key) {
         logger.debug("Attempting to retrieve rate from Redis with key: {}", key);
         Optional<RateInfoDto> result = Optional.ofNullable(redisTemplate.opsForValue().get(key));
@@ -82,6 +106,19 @@ public class ConversionService {
         return result;
     }
 
+    /**
+     * Fetches the historical rate for a currency pair from an external service.
+     * <p>
+     * This method performs a blocking HTTP GET request, authenticating with an
+     * AWS Cognito access token. It deserializes the JSON response into a
+     * {@link RateInfoDto}.
+     *
+     * @param currencyPair The currency pair string (e.g., "USD_EUR").
+     * @param accessToken  The AWS Cognito access token for authorization.
+     * @return An {@link Optional} containing the {@link RateInfoDto} if the request is successful and valid,
+     * or empty if the response is malformed.
+     * @throws RuntimeException if the HTTP request fails (e.g., network error, 4xx/5xx status codes).
+     */
     public Optional<RateInfoDto> getHistoricalRate(String currencyPair, String accessToken) {
         logger.info("Fetching historical rate from external API for pair: {}", currencyPair);
         try {
@@ -111,7 +148,6 @@ public class ConversionService {
                 return Optional.empty();
             }
         } catch (Exception e) {
-            logger.error("Failed to retrieve historical rate for currency pair {}. Error: {}", currencyPair, e.getMessage(), e);
             throw new DownStreamException("Failed to retrieve historical rate for currency pair " + currencyPair);
         }
     }

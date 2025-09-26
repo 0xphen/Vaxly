@@ -1,0 +1,105 @@
+2025-09-26 16:16:09.596 [main] INFO  conversion-service [] - Starting ConversionServiceApplication using Java 25 with PID 97904 (/Users/kifen/Dev/Java/Vaxly/conversion-service/target/classes started by kifen in /Users/kifen/Dev/Java/Vaxly/conversion-service)
+2025-09-26 16:16:09.598 [main] DEBUG conversion-service [] - Running with Spring Boot v3.5.6, Spring v6.2.11
+2025-09-26 16:16:09.599 [main] INFO  conversion-service [] - The following 1 profile is active: "dev"
+2025-09-26 16:16:10.216 [main] INFO  conversion-service [] - Multiple Spring Data modules found, entering strict repository configuration mode
+2025-09-26 16:16:10.218 [main] INFO  conversion-service [] - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-09-26 16:16:10.242 [main] INFO  conversion-service [] - Finished Spring Data repository scanning in 14 ms. Found 0 JPA repository interfaces.
+2025-09-26 16:16:10.262 [main] INFO  conversion-service [] - Multiple Spring Data modules found, entering strict repository configuration mode
+2025-09-26 16:16:10.264 [main] INFO  conversion-service [] - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2025-09-26 16:16:10.278 [main] INFO  conversion-service [] - Finished Spring Data repository scanning in 2 ms. Found 0 Redis repository interfaces.
+2025-09-26 16:16:10.874 [main] INFO  conversion-service [] - Tomcat initialized with port 8081 (http)
+2025-09-26 16:16:10.887 [main] INFO  conversion-service [] - Starting service [Tomcat]
+2025-09-26 16:16:10.887 [main] INFO  conversion-service [] - Starting Servlet engine: [Apache Tomcat/10.1.46]
+2025-09-26 16:16:10.952 [main] INFO  conversion-service [] - Initializing Spring embedded WebApplicationContext
+2025-09-26 16:16:10.952 [main] INFO  conversion-service [] - Root WebApplicationContext: initialization completed in 1317 ms
+2025-09-26 16:16:11.121 [main] INFO  conversion-service [] - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-09-26 16:16:11.181 [main] INFO  conversion-service [] - HHH000412: Hibernate ORM core version 6.6.29.Final
+2025-09-26 16:16:11.211 [main] INFO  conversion-service [] - HHH000026: Second-level cache disabled
+2025-09-26 16:16:11.484 [main] INFO  conversion-service [] - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-09-26 16:16:11.512 [main] INFO  conversion-service [] - HikariPool-1 - Starting...
+2025-09-26 16:16:11.669 [main] INFO  conversion-service [] - HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:vaxlydb user=SA
+2025-09-26 16:16:11.685 [main] INFO  conversion-service [] - HikariPool-1 - Start completed.
+2025-09-26 16:16:11.765 [main] INFO  conversion-service [] - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-09-26 16:16:12.110 [main] INFO  conversion-service [] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-09-26 16:16:12.115 [main] INFO  conversion-service [] - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-09-26 16:16:13.021 [main] WARN  conversion-service [] - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-09-26 16:16:13.110 [main] DEBUG conversion-service [] - 3 mappings in 'requestMappingHandlerMapping'
+2025-09-26 16:16:13.149 [main] DEBUG conversion-service [] - Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+2025-09-26 16:16:13.176 [main] DEBUG conversion-service [] - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+2025-09-26 16:16:13.219 [main] DEBUG conversion-service [] - ControllerAdvice beans: 1 @ExceptionHandler, 1 ResponseBodyAdvice
+2025-09-26 16:16:13.415 [main] INFO  conversion-service [] - Tomcat started on port 8081 (http) with context path '/'
+2025-09-26 16:16:13.423 [main] INFO  conversion-service [] - Started ConversionServiceApplication in 4.455 seconds (process running for 4.759)
+2025-09-26 16:16:33.825 [http-nio-8081-exec-1] INFO  conversion-service [] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-09-26 16:16:33.826 [http-nio-8081-exec-1] INFO  conversion-service [] - Initializing Servlet 'dispatcherServlet'
+2025-09-26 16:16:33.826 [http-nio-8081-exec-1] DEBUG conversion-service [] - Detected StandardServletMultipartResolver
+2025-09-26 16:16:33.826 [http-nio-8081-exec-1] DEBUG conversion-service [] - Detected AcceptHeaderLocaleResolver
+2025-09-26 16:16:33.827 [http-nio-8081-exec-1] DEBUG conversion-service [] - Detected FixedThemeResolver
+2025-09-26 16:16:33.828 [http-nio-8081-exec-1] DEBUG conversion-service [] - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@1693d505
+2025-09-26 16:16:33.828 [http-nio-8081-exec-1] DEBUG conversion-service [] - Detected org.springframework.web.servlet.support.SessionFlashMapManager@67730dab
+2025-09-26 16:16:33.829 [http-nio-8081-exec-1] DEBUG conversion-service [] - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+2025-09-26 16:16:33.829 [http-nio-8081-exec-1] INFO  conversion-service [] - Completed initialization in 3 ms
+2025-09-26 16:16:33.838 [http-nio-8081-exec-1] DEBUG conversion-service [] - GET "/api/v1/convert?from=EUR&to=USD&amount=100", parameters={masked}
+2025-09-26 16:16:33.850 [http-nio-8081-exec-1] DEBUG conversion-service [] - Mapped to com.vaxly.conversionservice.ConversionController#convert(String, String, double)
+2025-09-26 16:16:33.928 [http-nio-8081-exec-1] INFO  conversion-service [c61180f2-9a09-4393-accd-61f0d2b32e41] - Received request to convert 100.0 EUR to USD
+2025-09-26 16:16:34.339 [http-nio-8081-exec-1] DEBUG conversion-service [c61180f2-9a09-4393-accd-61f0d2b32e41] - [40967366] HTTP POST https://us-east-2igrqq8rhb.auth.us-east-2.amazoncognito.com/oauth2/token
+2025-09-26 16:16:35.078 [reactor-http-nio-3] DEBUG conversion-service [] - [40967366] Writing "grant_type=client_credentials&client_id=3ke2fgifpd0o298bvan5ik3gsp&client_secret=16rikb8h67fb3d2as89 (truncated)..."
+2025-09-26 16:16:35.835 [reactor-http-nio-3] DEBUG conversion-service [] - [40967366] [d3a05b1d-1] Response 200 OK
+2025-09-26 16:16:35.851 [reactor-http-nio-3] DEBUG conversion-service [] - [40967366] [d3a05b1d-1] Decoded "{"access_token":"eyJraWQiOiIxZHA1RWd2R0tEZkhDZTE3Y2l3d2JHTzkxVjUzeVwvWmVDcUs0OGc1QWZ6MD0iLCJhbGciOiJ (truncated)..."
+2025-09-26 16:16:35.866 [http-nio-8081-exec-1] DEBUG conversion-service [c61180f2-9a09-4393-accd-61f0d2b32e41] - [78e7048f] HTTP GET http://localhost:8080/api/v1/historical-rates/EUR_USD
+2025-09-26 16:16:36.691 [reactor-http-nio-4] DEBUG conversion-service [] - [78e7048f] [4a3a39ed-1] Response 200 OK
+2025-09-26 16:16:36.693 [reactor-http-nio-4] DEBUG conversion-service [] - [78e7048f] [4a3a39ed-1] Decoded "{"currencyPair":"EUR_USD","rate":1.20000000,"lastUpdatedAt":"1970-01-02T10:17:36Z","source":"dev_sou (truncated)..."
+2025-09-26 16:16:36.694 [http-nio-8081-exec-1] INFO  conversion-service [c61180f2-9a09-4393-accd-61f0d2b32e41] - Successfully converted 100.0 EUR to USD with result: 120.0
+2025-09-26 16:16:36.735 [http-nio-8081-exec-1] DEBUG conversion-service [c61180f2-9a09-4393-accd-61f0d2b32e41] - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-09-26 16:16:36.736 [http-nio-8081-exec-1] DEBUG conversion-service [c61180f2-9a09-4393-accd-61f0d2b32e41] - Writing [com.vaxly.conversionservice.dtos.ConversionResponseDto@740de0ff]
+2025-09-26 16:16:36.750 [http-nio-8081-exec-1] DEBUG conversion-service [] - Completed 200 OK
+2025-09-26 16:34:12.183 [SpringApplicationShutdownHook] INFO  conversion-service [] - Commencing graceful shutdown. Waiting for active requests to complete
+2025-09-26 16:34:14.215 [tomcat-shutdown] INFO  conversion-service [] - Graceful shutdown complete
+2025-09-26 16:34:16.324 [SpringApplicationShutdownHook] INFO  conversion-service [] - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-09-26 16:34:16.332 [SpringApplicationShutdownHook] INFO  conversion-service [] - HikariPool-1 - Shutdown initiated...
+2025-09-26 16:34:16.335 [SpringApplicationShutdownHook] INFO  conversion-service [] - HikariPool-1 - Shutdown completed.
+2025-09-26 16:36:56.229 [main] INFO  springAppName_IS_UNDEFINED [] - Starting ConversionServiceApplication using Java 25 with PID 98471 (/Users/kifen/Dev/Java/Vaxly/conversion-service/target/classes started by kifen in /Users/kifen/Dev/Java/Vaxly/conversion-service)
+2025-09-26 16:36:56.230 [main] DEBUG springAppName_IS_UNDEFINED [] - Running with Spring Boot v3.5.6, Spring v6.2.11
+2025-09-26 16:36:56.231 [main] INFO  springAppName_IS_UNDEFINED [] - The following 1 profile is active: "dev"
+2025-09-26 16:36:56.789 [main] INFO  springAppName_IS_UNDEFINED [] - Multiple Spring Data modules found, entering strict repository configuration mode
+2025-09-26 16:36:56.791 [main] INFO  springAppName_IS_UNDEFINED [] - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-09-26 16:36:56.814 [main] INFO  springAppName_IS_UNDEFINED [] - Finished Spring Data repository scanning in 13 ms. Found 0 JPA repository interfaces.
+2025-09-26 16:36:56.832 [main] INFO  springAppName_IS_UNDEFINED [] - Multiple Spring Data modules found, entering strict repository configuration mode
+2025-09-26 16:36:56.834 [main] INFO  springAppName_IS_UNDEFINED [] - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2025-09-26 16:36:56.847 [main] INFO  springAppName_IS_UNDEFINED [] - Finished Spring Data repository scanning in 2 ms. Found 0 Redis repository interfaces.
+2025-09-26 16:36:57.418 [main] INFO  springAppName_IS_UNDEFINED [] - Tomcat initialized with port 8081 (http)
+2025-09-26 16:36:57.433 [main] INFO  springAppName_IS_UNDEFINED [] - Starting service [Tomcat]
+2025-09-26 16:36:57.434 [main] INFO  springAppName_IS_UNDEFINED [] - Starting Servlet engine: [Apache Tomcat/10.1.46]
+2025-09-26 16:36:57.478 [main] INFO  springAppName_IS_UNDEFINED [] - Initializing Spring embedded WebApplicationContext
+2025-09-26 16:36:57.478 [main] INFO  springAppName_IS_UNDEFINED [] - Root WebApplicationContext: initialization completed in 1215 ms
+2025-09-26 16:36:57.625 [main] INFO  springAppName_IS_UNDEFINED [] - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-09-26 16:36:57.677 [main] INFO  springAppName_IS_UNDEFINED [] - HHH000412: Hibernate ORM core version 6.6.29.Final
+2025-09-26 16:36:57.710 [main] INFO  springAppName_IS_UNDEFINED [] - HHH000026: Second-level cache disabled
+2025-09-26 16:36:58.042 [main] INFO  springAppName_IS_UNDEFINED [] - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-09-26 16:36:58.070 [main] INFO  springAppName_IS_UNDEFINED [] - HikariPool-1 - Starting...
+2025-09-26 16:36:58.238 [main] INFO  springAppName_IS_UNDEFINED [] - HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:vaxlydb user=SA
+2025-09-26 16:36:58.240 [main] INFO  springAppName_IS_UNDEFINED [] - HikariPool-1 - Start completed.
+2025-09-26 16:36:58.298 [main] INFO  springAppName_IS_UNDEFINED [] - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-09-26 16:36:58.642 [main] INFO  springAppName_IS_UNDEFINED [] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-09-26 16:36:58.647 [main] INFO  springAppName_IS_UNDEFINED [] - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-09-26 16:36:59.557 [main] WARN  springAppName_IS_UNDEFINED [] - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-09-26 16:36:59.909 [main] INFO  springAppName_IS_UNDEFINED [] - Tomcat started on port 8081 (http) with context path '/'
+2025-09-26 16:36:59.917 [main] INFO  springAppName_IS_UNDEFINED [] - Started ConversionServiceApplication in 4.142 seconds (process running for 4.404)
+2025-09-26 16:37:21.911 [SpringApplicationShutdownHook] INFO  springAppName_IS_UNDEFINED [] - Commencing graceful shutdown. Waiting for active requests to complete
+2025-09-26 16:37:21.924 [tomcat-shutdown] INFO  springAppName_IS_UNDEFINED [] - Graceful shutdown complete
+2025-09-26 16:37:24.003 [SpringApplicationShutdownHook] INFO  springAppName_IS_UNDEFINED [] - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-09-26 16:37:24.006 [SpringApplicationShutdownHook] INFO  springAppName_IS_UNDEFINED [] - HikariPool-1 - Shutdown initiated...
+2025-09-26 16:37:24.008 [SpringApplicationShutdownHook] INFO  springAppName_IS_UNDEFINED [] - HikariPool-1 - Shutdown completed.

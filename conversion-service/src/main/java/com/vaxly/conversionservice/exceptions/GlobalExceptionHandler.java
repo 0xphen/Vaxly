@@ -1,5 +1,8 @@
 package com.vaxly.conversionservice.exceptions;
 
+import com.vaxly.conversionservice.ConversionController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +16,8 @@ import java.util.UUID;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     /**
      * Handles downstream service failures.
      * Returns 503 with correlation ID and optional Retry-After.
@@ -21,8 +26,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleDownstreamException(DownStreamException ex,
                                                                    HttpServletRequest request) {
         String correlationId = UUID.randomUUID().toString();
-
-        System.err.println("CorrelationID=" + correlationId + " | Downstream error: " + ex.getMessage());
 
         ErrorResponse body = new ErrorResponse(
                 Instant.now().toString(),

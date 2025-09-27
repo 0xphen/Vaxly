@@ -1,6 +1,7 @@
 package com.vaxly.conversionservice;
 
 import com.vaxly.conversionservice.enums.StateFlag;
+import com.vaxly.conversionservice.service.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,7 +34,7 @@ public class ConversionController {
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
         }
 
-        logger.info("Successfully converted {} {} to {} with result: {}", amount, from, to, response.getConvertedAmount());
+        logger.info("Successfully converted {} {} to {}. Converted amount: {}", amount, from, to, response.getConvertedAmount());
         return ResponseEntity.ok(response);
     }
 }

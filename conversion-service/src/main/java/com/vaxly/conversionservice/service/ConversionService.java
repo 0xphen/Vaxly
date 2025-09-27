@@ -1,4 +1,4 @@
-package com.vaxly.conversionservice;
+package com.vaxly.conversionservice.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,13 +6,17 @@ import com.vaxly.conversionservice.dtos.ConversionResponseDto;
 import com.vaxly.conversionservice.dtos.RateInfoDto;
 import com.vaxly.conversionservice.enums.StateFlag;
 import com.vaxly.conversionservice.exceptions.DownStreamException;
+import com.vaxly.conversionservice.exceptions.HistoricalRateNotFoundException;
 import com.vaxly.conversionservice.security.AwsCognitoTokenProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -23,14 +27,18 @@ public class ConversionService {
     private final RedisTemplate<String, RateInfoDto> redisTemplate;
     private final WebClient webClient;
     private final  AwsCognitoTokenProvider tokenProvider;
+    private final SqsProducerService sqsProducerService;
+    private final UsageCounterService usageCounterService;
 
     private final ObjectMapper mapper = new ObjectMapper();
     private static final Logger logger = LoggerFactory.getLogger(ConversionService.class);
 
-    public ConversionService(RedisTemplate<String, RateInfoDto> redisTemplate, WebClient webClient, AwsCognitoTokenProvider tokenProvider) {
+    public ConversionService(RedisTemplate<String, RateInfoDto> redisTemplate, WebClient webClient, AwsCognitoTokenProvider tokenProvider, SqsProducerService sqsProducerService, UsageCounterService usageCounterService) {
         this.redisTemplate = redisTemplate;
         this.webClient = webClient;
         this.tokenProvider = tokenProvider;
+        this.sqsProducerService = sqsProducerService;
+        this.usageCounterService = usageCounterService;
     }
 
     /**
@@ -54,6 +62,8 @@ public class ConversionService {
 
         Optional<RateInfoDto> cachedData = getCachedRate(currencyPairKey);
         if (cachedData.isPresent()) {
+            usageCounterService.incrementUsage(currencyPairKey);
+
             RateInfoDto data = cachedData.get();
             logger.info("Rate for {} found in cache. Source: {}", currencyPairKey, data.getSource());
             return new ConversionResponseDto(
@@ -70,6 +80,8 @@ public class ConversionService {
         String accessToken = tokenProvider.getAccessToken();
         Optional<RateInfoDto> historicalData = getHistoricalRate(currencyPairKey, accessToken);
         if (historicalData.isPresent()) {
+            usageCounterService.incrementUsage(currencyPairKey);
+
             RateInfoDto data = historicalData.get();
             logger.info("Successfully fetched rate for {} from external API. Source: {}", currencyPairKey, data.getSource());
             return new ConversionResponseDto(
@@ -85,7 +97,7 @@ public class ConversionService {
         logger.warn("Rate for {} not found in cache or external API. Returning UNAVAILABLE status.", currencyPairKey);
 
         // Publish a background refresh message for this currency pair to trigger async rate population
-        // TODO: Publish a background refresh message for this currency pair to trigger async rate population
+        sqsProducerService.sendMessage(currencyPairKey);
         return new ConversionResponseDto(from, to, 0.0, 0.0, null, null, StateFlag.UNAVAILABLE);
     }
 
@@ -109,46 +121,79 @@ public class ConversionService {
     /**
      * Fetches the historical rate for a currency pair from an external service.
      * <p>
-     * This method performs a blocking HTTP GET request, authenticating with an
-     * AWS Cognito access token. It deserializes the JSON response into a
-     * {@link RateInfoDto}.
+     * This method coordinates the retrieval of a currency rate by handling the
+     * primary call and managing potential exceptions.
      *
      * @param currencyPair The currency pair string (e.g., "USD_EUR").
      * @param accessToken  The AWS Cognito access token for authorization.
-     * @return An {@link Optional} containing the {@link RateInfoDto} if the request is successful and valid,
-     * or empty if the response is malformed.
-     * @throws RuntimeException if the HTTP request fails (e.g., network error, 4xx/5xx status codes).
+     * @return An {@link Optional} containing the {@link RateInfoDto} if the rate is retrieved,
+     * or empty if the request failed or returned no data.
      */
     public Optional<RateInfoDto> getHistoricalRate(String currencyPair, String accessToken) {
         logger.info("Fetching historical rate from external API for pair: {}", currencyPair);
+
+        try {
+            Optional<RateInfoDto> result = fetchRateFromApi(currencyPair, accessToken);
+
+            if (result.isPresent()) {
+                logger.info("Successfully received rate for {} from downstream API. Rate: {}", currencyPair, result.get().getRate());
+            } else {
+                logger.warn("Response from downstream API for {} did not contain a valid rate.", currencyPair);
+            }
+            return result;
+        } catch (Exception e) {
+            logger.error("Failed to retrieve historical rate for currency pair {}. Error: {}", currencyPair, e.getMessage(), e);
+            throw new DownStreamException("Failed to retrieve historical rate for currency pair " + currencyPair);
+        }
+    }
+
+    /**
+     * Executes the WebClient call and handles deserialization and HTTP status codes.
+     * <p>
+     * This helper method encapsulates the entire WebClient interaction, returning an
+     * Optional with the result or an empty Optional on a 404 response. Other errors
+     * will be propagated as exceptions.
+     *
+     * @param currencyPair The currency pair for the API call.
+     * @param accessToken  The authorization token.
+     * @return An {@link Optional} containing the deserialized data or empty on a 404 response.
+     */
+    private Optional<RateInfoDto> fetchRateFromApi(String currencyPair, String accessToken) {
         try {
             String responseBody = webClient.get()
                     .uri(currencyPair)
                     .header("Authorization", "Bearer " + accessToken)
                     .retrieve()
-                    .onStatus(HttpStatusCode::isError, resp ->
-                            resp.bodyToMono(String.class)
-                                    .map(body -> {
-                                        logger.error("Downstream service returned an error. Status: {}, Body: {}", resp.statusCode(), body);
-                                        return new DownStreamException("Downstream error: " + body);
-                                    }))
+                    .onStatus(status -> status.value() == HttpStatus.NOT_FOUND.value(), resp -> {
+                        logger.warn("Rate for {} not found in downstream service (404).", currencyPair);
+                        return Mono.error(new HistoricalRateNotFoundException("Rate not found"));
+                    })
+                    .onStatus(HttpStatusCode::isError, resp -> {
+                        logger.error("Downstream service returned an error. Status: {}", resp.statusCode());
+                        return resp.createException();
+                    })
                     .bodyToMono(String.class)
                     .block();
 
-            JsonNode node = mapper.readTree(responseBody);
 
+            JsonNode node = mapper.readTree(responseBody);
             if (node.has("rate") && node.has("source")) {
                 double rate = node.get("rate").asDouble();
                 String source = node.get("source").asText();
                 Instant timestamp = Instant.now();
-                logger.info("Successfully received rate for {} from downstream API. Rate: {}", currencyPair, rate);
                 return Optional.of(new RateInfoDto(source, timestamp, rate));
             } else {
                 logger.warn("Response from downstream API for {} did not contain expected fields.", currencyPair);
                 return Optional.empty();
             }
+        } catch (HistoricalRateNotFoundException e) {
+            return Optional.empty();
+        } catch (WebClientResponseException e) {
+            logger.error("WebClient error while fetching historical rate for {}. Status: {}, Body: {}", currencyPair, e.getStatusCode(), e.getResponseBodyAsString());
+            return Optional.empty();
         } catch (Exception e) {
-            throw new DownStreamException("Failed to retrieve historical rate for currency pair " + currencyPair);
+            logger.error("Failed to retrieve historical rate for currency pair {}. Error: {}", currencyPair, e.getMessage(), e);
+            return Optional.empty();
         }
     }
 }

@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.vaxly</groupId>
-	<artifactId>historical-service</artifactId>
+	<artifactId>history-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>historical-service</name>
 	<description>historical-service</description>

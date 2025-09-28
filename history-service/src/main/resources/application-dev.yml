@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5332/vaxly_dev
+    url: jdbc:postgresql://postgres:5432/vaxly_dev
     username: qfen
     password: password
     driver-class-name: org.postgresql.Driver

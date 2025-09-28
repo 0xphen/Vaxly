@@ -3,6 +3,11 @@ WORKDIR /app
 COPY . .
 RUN mvn clean package -DskipTests
 
+FROM eclipse-temurin:21-jre AS history-service
+WORKDIR /app
+COPY --from=build /app/history-service/target/*.jar app.jar
+ENTRYPOINT ["java", "-jar", "app.jar"]
+
 FROM eclipse-temurin:21-jre AS conversion-service
 WORKDIR /app
 COPY --from=build /app/conversion-service/target/*.jar app.jar

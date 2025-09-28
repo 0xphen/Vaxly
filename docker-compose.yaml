@@ -20,6 +20,21 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - vaxly-network
+  history-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: history-service
+    container_name: vaxly-history-service
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - vaxly-network
   conversion-service:
     build:
       context: .
@@ -27,7 +42,7 @@ services:
       target: conversion-service
     container_name: vaxly-conversion-service
     ports:
-      - "8081:8081"
+      - "8082:8082"
     environment:
       - SPRING_PROFILES_ACTIVE=dev
     depends_on:
@@ -45,7 +60,6 @@ services:
       - SPRING_PROFILES_ACTIVE=dev
     depends_on:
       - redis
-      - postgres
     networks:
       - vaxly-network
 volumes:

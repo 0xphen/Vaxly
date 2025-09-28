@@ -71,7 +71,7 @@ public class RateRefreshScheduler {
             return;
         }
 
-        logger.info("Publishing {} eligible pairs to SQS: {}", eligiblePairs.size(), eligiblePairs);
+        logger.info("Publishing {} eligible pair(s) to SQS: {}", eligiblePairs.size(), eligiblePairs);
 
         // Mark each pair as in-flight and enqueue to SQS
         eligiblePairs.forEach(pair -> {

@@ -18,6 +18,8 @@
     <modules>
         <module>conversion-service</module>
         <module>historical-service</module>
+        <module>scheduler-service</module>
+        <module>vaxly-shared</module>
     </modules>
 
 </project>

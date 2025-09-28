@@ -30,7 +30,7 @@ public class ConversionController {
 
         ConversionResponseDto response = conversionService.convert(from, to, amount);
         if (response.getStateFlag() == StateFlag.UNAVAILABLE) {
-            logger.warn("Conversion service is unavailable. Returning 503 Service Unavailable.");
+            logger.warn("Rate for {}_{} not found in cache or external API. Returning UNAVAILABLE status.", from, to);
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
         }
 

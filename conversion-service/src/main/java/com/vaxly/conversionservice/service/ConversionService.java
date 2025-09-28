@@ -3,13 +3,16 @@ package com.vaxly.conversionservice.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vaxly.conversionservice.dtos.ConversionResponseDto;
-import com.vaxly.conversionservice.dtos.RateInfoDto;
+import com.vaxly.vaxlyshared.dtos.RateInfoDto;
+import com.vaxly.vaxlyshared.service.SqsProducerService;
 import com.vaxly.conversionservice.enums.StateFlag;
 import com.vaxly.conversionservice.exceptions.DownStreamException;
 import com.vaxly.conversionservice.exceptions.HistoricalRateNotFoundException;
 import com.vaxly.conversionservice.security.AwsCognitoTokenProvider;
+import com.vaxly.vaxlyshared.constants.RedisKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -24,7 +27,9 @@ import java.util.Optional;
 @Service
 public class ConversionService {
 
-    private final RedisTemplate<String, RateInfoDto> redisTemplate;
+    @Autowired
+    private RedisTemplate<String, RateInfoDto> redisTemplate;
+
     private final WebClient webClient;
     private final  AwsCognitoTokenProvider tokenProvider;
     private final SqsProducerService sqsProducerService;
@@ -40,6 +45,7 @@ public class ConversionService {
         this.sqsProducerService = sqsProducerService;
         this.usageCounterService = usageCounterService;
     }
+
 
     /**
      * Converts an amount from one currency to another using a tiered data source strategy.
@@ -57,15 +63,15 @@ public class ConversionService {
      * @return A {@link ConversionResponseDto} with the conversion result and data source state.
      */
     public ConversionResponseDto convert(String from, String to, double amount) {
-        String currencyPairKey = from + "_" + to;
-        logger.info("Starting conversion for {} from {} to {}. Checking cache for key: {}", amount, from, to, currencyPairKey);
+        String currencyPair = RedisKeys.normalizePair(from, to);
+        logger.info("Starting conversion for {} from {} to {}. Checking cache for key: {}", amount, from, to, currencyPair);
 
-        Optional<RateInfoDto> cachedData = getCachedRate(currencyPairKey);
+        Optional<RateInfoDto> cachedData = getCachedRate(currencyPair);
         if (cachedData.isPresent()) {
-            usageCounterService.incrementUsage(currencyPairKey);
+            usageCounterService.incrementUsage(currencyPair);
 
             RateInfoDto data = cachedData.get();
-            logger.info("Rate for {} found in cache. Source: {}", currencyPairKey, data.getSource());
+            logger.info("Rate for {} found in cache. Source: {}", currencyPair, data.getSource());
             return new ConversionResponseDto(
                     from, to,
                     data.getRate(),
@@ -76,14 +82,14 @@ public class ConversionService {
             );
         }
 
-        logger.info("Rate for {} not found in cache. Falling back to external API.", currencyPairKey);
+        logger.info("Rate for {} not found in cache. Falling back to external API.", currencyPair);
         String accessToken = tokenProvider.getAccessToken();
-        Optional<RateInfoDto> historicalData = getHistoricalRate(currencyPairKey, accessToken);
+        Optional<RateInfoDto> historicalData = getHistoricalRate(currencyPair, accessToken);
         if (historicalData.isPresent()) {
-            usageCounterService.incrementUsage(currencyPairKey);
+            usageCounterService.incrementUsage(currencyPair);
 
             RateInfoDto data = historicalData.get();
-            logger.info("Successfully fetched rate for {} from external API. Source: {}", currencyPairKey, data.getSource());
+            logger.info("Successfully fetched rate for {} from external API. Source: {}", currencyPair, data.getSource());
             return new ConversionResponseDto(
                     from, to,
                     data.getRate(),
@@ -94,10 +100,10 @@ public class ConversionService {
             );
         }
 
-        logger.warn("Rate for {} not found in cache or external API. Returning UNAVAILABLE status.", currencyPairKey);
+        logger.warn("Rate for {} not found in cache or external API. Returning UNAVAILABLE status.", currencyPair);
 
         // Publish a background refresh message for this currency pair to trigger async rate population
-        sqsProducerService.sendMessage(currencyPairKey);
+        sqsProducerService.sendMessage(currencyPair);
         return new ConversionResponseDto(from, to, 0.0, 0.0, null, null, StateFlag.UNAVAILABLE);
     }
 

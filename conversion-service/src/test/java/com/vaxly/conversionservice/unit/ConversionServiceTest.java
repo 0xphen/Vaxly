@@ -2,10 +2,10 @@ package com.vaxly.conversionservice.unit;
 
 import com.vaxly.conversionservice.service.ConversionService;
 import com.vaxly.conversionservice.dtos.ConversionResponseDto;
-import com.vaxly.conversionservice.dtos.RateInfoDto;
+import com.vaxly.vaxlyshared.dtos.RateInfoDto;
 import com.vaxly.conversionservice.enums.StateFlag;
 import com.vaxly.conversionservice.security.AwsCognitoTokenProvider;
-import com.vaxly.conversionservice.service.SqsProducerService;
+import com.vaxly.vaxlyshared.service.SqsProducerService;
 import com.vaxly.conversionservice.service.UsageCounterService;
 import org.mockito.Mock;
 import org.mockito.InjectMocks;

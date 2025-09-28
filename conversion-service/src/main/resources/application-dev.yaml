@@ -19,6 +19,16 @@ spring:
   flyway:
     clean-on-validation-error: true
 
+  cloud:
+    aws:
+      region:
+        static: us-east-2
+      credentials:
+        access-key: AKIA55OMVDCRW5Q5SBA3
+        secret-key: 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
+      sqs:
+        queue-url: https://sqs.us-east-2.amazonaws.com/956596295843/vaxly-dev-sqs-queue
+
 security:
   cognito:
     client-id: 3ke2fgifpd0o298bvan5ik3gsp
@@ -29,13 +39,3 @@ security:
 external:
   api:
     base-url: http://localhost:8080/api/v1/historical-rates/
-
-cloud:
-  aws:
-    region:
-      static: us-east-2
-    credentials:
-      secret-key: 49MrryiisqRrk/qL3Nzg8jAtvPpXC20Bs1G3Xp4H
-      access-key: AKIA55OMVDCRW5Q5SBA3
-    sqs:
-      queue-name: vaxly-dev-sqs-queue

@@ -1,6 +1,6 @@
-package com.vaxly.conversionservice.config;
+package com.vaxly.vaxlyshared.config;
 
-import com.vaxly.conversionservice.config.CorrelationIdInterceptor;
+import com.vaxly.vaxlyshared.config.CorrelationIdInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;

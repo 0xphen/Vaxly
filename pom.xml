@@ -19,6 +19,7 @@
         <module>conversion-service</module>
         <module>history-service</module>
         <module>scheduler-service</module>
+        <module>worker-service</module>
         <module>vaxly-shared</module>
     </modules>
 

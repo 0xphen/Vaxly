@@ -1,9 +1,8 @@
-package com.vaxly.conversionservice.security;
+package com.vaxly.vaxlyshared.aws;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vaxly.conversionservice.dtos.CognitoResponseDto;
-import jakarta.annotation.PostConstruct;
+import com.vaxly.vaxlyshared.dtos.CognitoResponseDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;

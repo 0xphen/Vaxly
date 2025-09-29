@@ -1,4 +1,4 @@
-package com.vaxly.conversionservice.dtos;
+package com.vaxly.vaxlyshared.dtos;
 
 public class CognitoResponseDto {
     private final String accessToken;

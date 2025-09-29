@@ -8,7 +8,7 @@ import com.vaxly.vaxlyshared.service.SqsProducerService;
 import com.vaxly.conversionservice.enums.StateFlag;
 import com.vaxly.conversionservice.exceptions.DownStreamException;
 import com.vaxly.conversionservice.exceptions.HistoricalRateNotFoundException;
-import com.vaxly.conversionservice.security.AwsCognitoTokenProvider;
+import com.vaxly.vaxlyshared.aws.AwsCognitoTokenProvider;
 import com.vaxly.vaxlyshared.constants.RedisKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

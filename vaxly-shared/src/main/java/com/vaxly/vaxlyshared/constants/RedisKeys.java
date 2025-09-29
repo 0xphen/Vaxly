@@ -69,6 +69,10 @@ public final class RedisKeys {
         return RATE_PREFIX + normalizePair(base, quote);
     }
 
+    public static String rateKey(String currencyPair) {
+        return RATE_PREFIX +currencyPair.toUpperCase();
+    }
+
     /**
      * Normalizes a currency pair string to a consistent format (uppercase, separated by underscore).
      *

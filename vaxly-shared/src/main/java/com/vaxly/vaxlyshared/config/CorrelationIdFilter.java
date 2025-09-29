@@ -1,4 +1,4 @@
-package com.vaxly.conversionservice.config;
+package com.vaxly.vaxlyshared.config;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;

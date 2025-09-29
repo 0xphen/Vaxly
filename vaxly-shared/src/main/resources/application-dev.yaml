@@ -1,0 +1,25 @@
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  cloud:
+    aws:
+      region:
+        static: us-east-2
+      credentials:
+        access-key: AKIA55OMVDCRW5Q5SBA3
+        secret-key: 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
+      sqs:
+        queue-url: https://sqs.us-east-2.amazonaws.com/956596295843/vaxly-dev-sqs-queue
+
+security:
+  cognito:
+    client-id: 3ke2fgifpd0o298bvan5ik3gsp
+    client-secret: 16rikb8h67fb3d2as890iiq3j42pc0lnk77f87ohb3sjhu99ljlg
+    token-endpoint: https://us-east-2igrqq8rhb.auth.us-east-2.amazoncognito.com/oauth2/token
+    scope: historical-service-api/historical-rates-writer
+
+external:
+  api:
+    base-url: http://localhost:8081/api/v1/historical-rates/

@@ -1,4 +1,4 @@
-package com.vaxly.conversionservice.security;
+package com.vaxly.vaxlyshared.aws;
 
 import java.time.Instant;
 

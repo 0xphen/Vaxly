@@ -3,17 +3,17 @@ spring:
     name: scheduler-service
   data:
     redis:
-      host: redis
-      port: 6379
+      host:
+      port:
   cloud:
     aws:
       region:
-        static: us-east-2
+        static:
       credentials:
-        access-key: AKIA55OMVDCRW5Q5SBA3
-        secret-key: 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
+        access-key:
+        secret-key:
       sqs:
-        queue-url: https://sqs.us-east-2.amazonaws.com/956596295843/vaxly-dev-sqs-queue
+        queue-url:
 
 scheduler:
   topPairsCount: 4

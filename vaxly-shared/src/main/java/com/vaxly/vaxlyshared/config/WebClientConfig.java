@@ -1,4 +1,4 @@
-package com.vaxly.conversionservice.config;
+package com.vaxly.vaxlyshared.config;
 
 import org.slf4j.MDC;
 import org.springframework.context.annotation.Bean;

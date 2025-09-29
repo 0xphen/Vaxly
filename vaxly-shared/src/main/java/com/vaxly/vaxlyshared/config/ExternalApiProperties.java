@@ -1,4 +1,4 @@
-package com.vaxly.conversionservice.config;
+package com.vaxly.vaxlyshared.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;

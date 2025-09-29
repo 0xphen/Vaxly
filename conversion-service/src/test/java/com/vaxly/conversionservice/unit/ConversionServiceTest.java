@@ -4,7 +4,7 @@ import com.vaxly.conversionservice.service.ConversionService;
 import com.vaxly.conversionservice.dtos.ConversionResponseDto;
 import com.vaxly.vaxlyshared.dtos.RateInfoDto;
 import com.vaxly.conversionservice.enums.StateFlag;
-import com.vaxly.conversionservice.security.AwsCognitoTokenProvider;
+import com.vaxly.vaxlyshared.aws.AwsCognitoTokenProvider;
 import com.vaxly.vaxlyshared.service.SqsProducerService;
 import com.vaxly.conversionservice.service.UsageCounterService;
 import org.mockito.Mock;
@@ -57,7 +57,7 @@ public class ConversionServiceTest {
     @Test
     @DisplayName("should return cached data")
     public void whenConvert_thenReturnsCachedData() {
-        RateInfoDto mockRateInfo = new RateInfoDto(DEFAULT_SOURCE, Instant.now(), DEFAULT_RATE);
+        RateInfoDto mockRateInfo = new RateInfoDto(DEFAULT_SOURCE, Instant.now(), DEFAULT_RATE, DEFAULT_CURRENCY_PAIR);
 
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.get(DEFAULT_CURRENCY_PAIR)).thenReturn(mockRateInfo);
@@ -79,7 +79,7 @@ public class ConversionServiceTest {
 
         when(tokenProvider.getAccessToken()).thenReturn(DEFAULT_ACCESS_TOKEN);
 
-        RateInfoDto mockHistoricalRate = new RateInfoDto(DEFAULT_SOURCE, Instant.now(), DEFAULT_RATE);
+        RateInfoDto mockHistoricalRate = new RateInfoDto(DEFAULT_SOURCE, Instant.now(), DEFAULT_RATE, DEFAULT_CURRENCY_PAIR);
         doReturn(Optional.of(mockHistoricalRate))
                 .when(conversionService).getHistoricalRate(DEFAULT_CURRENCY_PAIR, DEFAULT_ACCESS_TOKEN);
 

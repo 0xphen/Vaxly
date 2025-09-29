@@ -187,7 +187,7 @@ public class ConversionService {
                 double rate = node.get("rate").asDouble();
                 String source = node.get("source").asText();
                 Instant timestamp = Instant.now();
-                return Optional.of(new RateInfoDto(source, timestamp, rate));
+                return Optional.of(new RateInfoDto(source, timestamp, rate, currencyPair));
             } else {
                 logger.warn("Response from downstream API for {} did not contain expected fields.", currencyPair);
                 return Optional.empty();
